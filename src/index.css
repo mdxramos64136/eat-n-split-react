@@ -1,8 +1,8 @@
 :root {
-  --color-lightest: #fff4e6;
-  --color-light: #ffe8cc;
-  --color-medium: #ffa94d;
-  --color-dark: #ff922b;
+  --color-lightest: #e7ffe6;
+  --color-light: #eaffcc;
+  --color-medium: #5a991a;
+  --color-dark: #2bff3d;
 }
 
 * {
@@ -35,7 +35,7 @@ body {
 
 .button {
   background-color: var(--color-medium);
-  color: #343a40;
+  color: #ffffff;
   padding: 0.8rem 1.2rem;
   border: none;
   border-radius: 7px;
@@ -94,7 +94,7 @@ body {
   grid-column: 3;
 }
 
-.sidebar > .button {
+.sidebar>.button {
   float: right;
   margin-right: 1.2rem;
 }
@@ -122,6 +122,7 @@ form {
   margin-bottom: 1.6rem;
   padding: 1.2rem;
 }
+
 .form-split-bill {
   grid-template-columns: 1fr 12rem;
   padding: 3.2rem 4rem;
