@@ -22,18 +22,26 @@ const initialFriends = [
 ];
 
 export default function App() {
+  //array to be rendered
+  //const friends = initialFriends;
   const [showAddFriend, setShowAddFriend] = useState(false);
+  const [friends, setFriend] = useState(initialFriends);
 
   function handleShowAddFriend() {
     setShowAddFriend((show) => !show);
+  }
+
+  function HandleFriends(newFriend) {
+    setFriend((actualFriends) => [...friends, newFriend]);
+    setShowAddFriend(false); //once submited, hide the form
   }
 
   //
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendList />
-        {showAddFriend && <FormAddFriend />}
+        <FriendList friendsProp={friends} />
+        {showAddFriend && <FormAddFriend onAddFriendProp={HandleFriends} />}
         <Button onClickProp={handleShowAddFriend}>{showAddFriend ? "Close" : "Add Friend"}</Button>
       </div>
       <FormSplitBill />
@@ -41,13 +49,11 @@ export default function App() {
   );
 }
 ///////////////////////////////////////////////////////
-function FriendList() {
-  //array to be rendered
-  const friends = initialFriends;
+function FriendList({ friendsProp }) {
   //
   return (
     <ul>
-      {friends.map((friend) => (
+      {friendsProp.map((friend) => (
         <Friend
           friendProp={friend}
           key={friend.id}
@@ -91,14 +97,54 @@ function Button({ children, onClickProp }) {
   );
 }
 ///////////////////////////////////////////////////////
-function FormAddFriend() {
+//Create one state to each fields to get its data
+function FormAddFriend({ onAddFriendProp, onShowAddFriendProp }) {
+  const [name, setName] = useState("");
+  const [image, setImage] = useState("https://i.pravatar.cc/48");
+  //
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    //validating the fields:
+    if (!name || !image) {
+      alert("Please fill all fields");
+      return; // nothing will happen
+    }
+
+    const id = crypto.randomUUID(); //generates a random id
+    const newFriend = {
+      id,
+      name,
+      image: `${image}?u=${id}`, //generates a unique img takeing advantage of the default url in the state
+      balance: 0,
+    };
+
+    onAddFriendProp(newFriend);
+
+    //reseting the fields:
+    setName("");
+    setImage("https://i.pravatar.cc/48");
+  }
+  //
   return (
-    <form className="form-add-friend">
+    <form
+      className="form-add-friend"
+      onSubmit={handleSubmit}>
       <label>🧞Name</label>
-      <input type="text" />
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
       <label>📷Image URL</label>
-      <input type="text" />
-      <Button>Select</Button>
+      <input
+        type="text"
+        value={image}
+        onChange={(e) => e.target.value}
+      />
+
+      <Button>Add</Button>
     </form>
   );
 }
