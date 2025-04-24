@@ -38,11 +38,23 @@ export default function App() {
   }
 
   function HandleSelection(friend) {
-    //setSelectedFriend(friend);
+    //null  = any friend will be selected
     setSelectedFriend((currentSelected) => (currentSelected?.id === friend.id ? null : friend));
 
     //set to false so that when you select a friend the add form will be closed
     setShowAddFriend(false);
+  }
+
+  function handleSplitBill(value) {
+    console.log(value);
+    //updating an object(friends) in an array(friends)
+    setFriend((actualFriends) =>
+      actualFriends.map((friend) =>
+        friend.id === selectedFriend.id ? { ...friend, balance: friend.balance + value } : friend
+      )
+    );
+
+    setSelectedFriend(null); //close the form
   }
 
   //
@@ -60,10 +72,15 @@ export default function App() {
         <Button onClickProp={handleShowAddFriend}>{showAddFriend ? "Close" : "Add Friend"}</Button>
       </div>
 
-      {selectedFriend && <FormSplitBill selectedFriendProp={selectedFriend} />}
+      {selectedFriend && (
+        <FormSplitBill
+          selectedFriendProp={selectedFriend}
+          onSplitBillProp={handleSplitBill}
+        />
+      )}
     </div>
   );
-}
+} //App
 ///////////////////////////////////////////////////////
 function FriendList({ friendsProp, onSelectionProp, selectedFriendProp }) {
   //
@@ -82,7 +99,7 @@ function FriendList({ friendsProp, onSelectionProp, selectedFriendProp }) {
 }
 ///////////////////////////////////////////////////////
 function Friend({ friendProp, onSelectionProp, selectedFriendProp }) {
-  // it will useful to conditionanly aplpy styles (background changes)
+  // it will conditionanly aplpy styles (background changes)
   const isSelected = friendProp.id === selectedFriendProp?.id;
   return (
     <li className={isSelected ? "selected" : ""}>
@@ -104,6 +121,7 @@ function Friend({ friendProp, onSelectionProp, selectedFriendProp }) {
         </p>
       )}
       {friendProp.balance === 0 && <p>You and {friendProp.name} are even</p>}
+
       <Button onClickProp={() => onSelectionProp(friendProp)}>{isSelected ? "Close" : "Select"}</Button>
     </li>
   );
@@ -171,24 +189,62 @@ function FormAddFriend({ onAddFriendProp, onShowAddFriendProp }) {
   );
 }
 ///////////////////////////////////////////////////////
-function FormSplitBill({ selectedFriendProp }) {
-  //remember: friendProp is an object
+function FormSplitBill({ selectedFriendProp, onSplitBillProp }) {
+  // one state for each field
+  const [bill, setBill] = useState("");
+  const [paidByUser, setPaidByUser] = useState("");
+  const paidByFriend = bill ? bill - paidByUser : ""; //derived state
+  const [whoIsPaying, setWhoIsPaying] = useState("user");
+  //
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    //validating the fields:
+    if (!bill || !paidByUser) {
+      alert("Please fill all fields");
+      return; // nothing will happen
+    }
+
+    //updating the balance of the selected friend
+    // Positive if pay the bill, so your friend owes you.
+    // Negative if YOUT FRIEND pays the bill. You owe your friend.
+    onSplitBillProp(whoIsPaying === "user" ? paidByFriend : -paidByUser);
+
+    //reseting the fields:
+    // setBill("");
+    // setPaidByUser("");
+  }
+  //
   return (
-    <form className="form-split-bill">
+    <form
+      className="form-split-bill"
+      onSubmit={handleSubmit}>
       <h2>Split a bill with {selectedFriendProp.name}</h2>
       <label>💵Bill Value</label>
-      <input type="text" />
+      <input
+        type="number"
+        value={bill}
+        onChange={(e) => setBill(+e.target.value)}
+      />
 
       <label>💵Your Expanse</label>
-      <input type="text" />
+      <input
+        type="number"
+        value={paidByUser}
+        onChange={(e) => setPaidByUser(+e.target.value > bill ? bill : +e.target.value)}
+      />
 
       <label>💵{selectedFriendProp.name}'s Expense</label>
       <input
-        type="text"
+        type="number"
+        value={paidByFriend}
+        onChange={(e) => setPaidByUser(bill - +e.target.value)}
         disabled
       />
       <label>💸Who is paying the bill?</label>
-      <select>
+      <select
+        value={whoIsPaying}
+        onChange={(e) => setWhoIsPaying(e.target.value)}>
         <option value="user">You</option>
         <option value="friend">{selectedFriendProp.name}</option>
       </select>
