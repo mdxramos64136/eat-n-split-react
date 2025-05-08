@@ -39,18 +39,22 @@ export default function App() {
 
   function HandleSelection(friend) {
     //null  = any friend will be selected
-    setSelectedFriend((currentSelected) => (currentSelected?.id === friend.id ? null : friend));
+    setSelectedFriend((currentSelected) =>
+      currentSelected?.id === friend.id ? null : friend
+    );
 
     //set to false so that when you select a friend the add form will be closed
     setShowAddFriend(false);
   }
-
+  //
   function handleSplitBill(value) {
     console.log(value);
     //updating an object(friends) in an array(friends)
     setFriend((actualFriends) =>
       actualFriends.map((friend) =>
-        friend.id === selectedFriend.id ? { ...friend, balance: friend.balance + value } : friend
+        friend.id === selectedFriend.id
+          ? { ...friend, balance: friend.balance + value }
+          : friend
       )
     );
 
@@ -69,13 +73,16 @@ export default function App() {
 
         {showAddFriend && <FormAddFriend onAddFriendProp={HandleFriends} />}
 
-        <Button onClickProp={handleShowAddFriend}>{showAddFriend ? "Close" : "Add Friend"}</Button>
+        <Button onClickProp={handleShowAddFriend}>
+          {showAddFriend ? "Close" : "Add Friend"}
+        </Button>
       </div>
 
       {selectedFriend && (
         <FormSplitBill
           selectedFriendProp={selectedFriend}
           onSplitBillProp={handleSplitBill}
+          key={selectedFriend.id}
         />
       )}
     </div>
@@ -103,10 +110,7 @@ function Friend({ friendProp, onSelectionProp, selectedFriendProp }) {
   const isSelected = friendProp.id === selectedFriendProp?.id;
   return (
     <li className={isSelected ? "selected" : ""}>
-      <img
-        src={friendProp.image}
-        alt={friendProp.name}
-      />
+      <img src={friendProp.image} alt={friendProp.name} />
 
       <h3>{friendProp.name}</h3>
 
@@ -122,16 +126,16 @@ function Friend({ friendProp, onSelectionProp, selectedFriendProp }) {
       )}
       {friendProp.balance === 0 && <p>You and {friendProp.name} are even</p>}
 
-      <Button onClickProp={() => onSelectionProp(friendProp)}>{isSelected ? "Close" : "Select"}</Button>
+      <Button onClickProp={() => onSelectionProp(friendProp)}>
+        {isSelected ? "Close" : "Select"}
+      </Button>
     </li>
   );
 }
 ///////////////////////////////////////////////////////
 function Button({ children, onClickProp }) {
   return (
-    <button
-      className="button"
-      onClick={onClickProp}>
+    <button className="button" onClick={onClickProp}>
       {children}
     </button>
   );
@@ -167,9 +171,7 @@ function FormAddFriend({ onAddFriendProp, onShowAddFriendProp }) {
   }
   //
   return (
-    <form
-      className="form-add-friend"
-      onSubmit={handleSubmit}>
+    <form className="form-add-friend" onSubmit={handleSubmit}>
       <label>🧞Name</label>
       <input
         type="text"
@@ -178,11 +180,7 @@ function FormAddFriend({ onAddFriendProp, onShowAddFriendProp }) {
       />
 
       <label>📷Image URL</label>
-      <input
-        type="text"
-        value={image}
-        onChange={(e) => e.target.value}
-      />
+      <input type="text" value={image} onChange={(e) => e.target.value} />
 
       <Button>Add</Button>
     </form>
@@ -213,12 +211,10 @@ function FormSplitBill({ selectedFriendProp, onSplitBillProp }) {
     //reseting the fields:
     // setBill("");
     // setPaidByUser("");
-  }
+  } //handle submit
   //
   return (
-    <form
-      className="form-split-bill"
-      onSubmit={handleSubmit}>
+    <form className="form-split-bill" onSubmit={handleSubmit}>
       <h2>Split a bill with {selectedFriendProp.name}</h2>
       <label>💵Bill Value</label>
       <input
@@ -231,7 +227,9 @@ function FormSplitBill({ selectedFriendProp, onSplitBillProp }) {
       <input
         type="number"
         value={paidByUser}
-        onChange={(e) => setPaidByUser(+e.target.value > bill ? bill : +e.target.value)}
+        onChange={(e) =>
+          setPaidByUser(+e.target.value > bill ? bill : +e.target.value)
+        }
       />
 
       <label>💵{selectedFriendProp.name}'s Expense</label>
